@@ -1,5 +1,7 @@
-function tryCatchWrapper<T extends any[]>(fn: (...args: T) => Promise<any>) {
-    return async function (...args: T) {
+function tryCatchWrapper<T extends any[], R>(
+    fn: (...args: T) => Promise<R>
+): (...args: T) => Promise<R> {
+    return async function (...args: T): Promise<R> {
         try {
             return await fn(...args);
         } catch (error) {

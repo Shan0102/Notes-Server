@@ -2,6 +2,8 @@ import mysql from "mysql2";
 import pool from "./utils/pool.js";
 import { tryCatchWrapper } from "./utils/tryCatch.js";
 import { Note, RecievedNote, RecievedNoteFromAPI } from "../types/index.js";
+import calcObjectMemory from "./utils/calcObjectMemory.js";
+import { updateUserMemory } from "./usersTable.js";
 
 const ensureNotesTableExists = tryCatchWrapper(async () => {
     const createTableQuery = `CREATE TABLE IF NOT EXISTS notes (
@@ -25,6 +27,15 @@ const createNote = tryCatchWrapper(async (note: RecievedNoteFromAPI): Promise<nu
 
     const createdResult = result as mysql.ResultSetHeader;
     console.log(`[${new Date().toLocaleString()}]:Note created successfully:`, result);
+
+    const createdNote = await getNoteById(createdResult.insertId);
+    if (!createdNote) {
+        throw new Error(`After creation: Note with id: ${createdResult.insertId} not found`);
+    }
+
+    const bytes = calcObjectMemory(createdNote);
+    await updateUserMemory(note.user_id, bytes);
+
     return createdResult.insertId;
 });
 
@@ -55,6 +66,11 @@ const getNoteById = tryCatchWrapper(async (note_id: number): Promise<Note | null
 });
 
 const updateNote = tryCatchWrapper(async (note_id: number, note: RecievedNote): Promise<void> => {
+    const noteToUpdate = await getNoteById(note_id);
+    if (!noteToUpdate) {
+        throw new Error(`Before update: Note with ID ${note_id} not found`);
+    }
+
     const values = [note.title, note.content, note.completed, note_id];
     const query = `UPDATE notes SET title = ?, content = ?, completed = ? WHERE note_id = ?`;
     const [result] = await pool.query(query, values);
@@ -65,9 +81,24 @@ const updateNote = tryCatchWrapper(async (note_id: number, note: RecievedNote): 
     }
 
     console.log(`[${new Date().toLocaleString()}]:Note updated successfully:`, updatedResult);
+
+    const updatedNote = await getNoteById(note_id);
+    if (!updatedNote) {
+        throw new Error(`After update: Note with ID ${note_id} not found`);
+    }
+
+    const oldMemory = calcObjectMemory(noteToUpdate);
+    const newMemory = calcObjectMemory(updatedNote);
+
+    await updateUserMemory(noteToUpdate.user_id, newMemory - oldMemory);
 });
 
 const deleteNote = tryCatchWrapper(async (note_id: number): Promise<void> => {
+    const noteToDelete = await getNoteById(note_id);
+    if (!noteToDelete) {
+        throw new Error(`Before delete: Note with ID ${note_id} not found`);
+    }
+
     const query = `DELETE FROM notes WHERE note_id = ?`;
     const [result] = await pool.query(query, [note_id]);
 
@@ -77,6 +108,9 @@ const deleteNote = tryCatchWrapper(async (note_id: number): Promise<void> => {
     }
 
     console.log(`[${new Date().toLocaleString()}]:Note deleted successfully:`, deletedResult);
+
+    const bytes = calcObjectMemory(noteToDelete);
+    await updateUserMemory(noteToDelete.user_id, -bytes);
 });
 
 export {

@@ -16,7 +16,7 @@ function validateNote(note: unknown): asserts note is RecievedNote {
 }
 
 function validateTitle(title: unknown): void {
-    if (!title || typeof title !== "string") {
+    if (typeof title !== "string") {
         createErrorApp("Invalid title: Title is required and must be a string.", 400);
     }
     if (title.length > 255) {
@@ -25,7 +25,7 @@ function validateTitle(title: unknown): void {
 }
 
 function validateContent(content: unknown): void {
-    if (!content || typeof content !== "string") {
+    if (typeof content !== "string") {
         createErrorApp("Invalid content: Content is required and must be a string.", 400);
     }
     if (content.length > 10000) {
@@ -34,8 +34,11 @@ function validateContent(content: unknown): void {
 }
 
 function validateCompleted(completed: unknown): void {
-    if (!completed || typeof completed !== "boolean") {
-        createErrorApp("Invalid content: Content is required and must be a boolean.", 400);
+    if (typeof completed !== "boolean") {
+        createErrorApp(
+            "Invalid completed: Completed status is required and must be a boolean.",
+            400
+        );
     }
 }
 

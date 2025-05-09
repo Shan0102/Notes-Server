@@ -6,11 +6,12 @@ interface User {
     password: string; // bcrypt password
     google_id: string | null; // unique
     role: string;
+    memory_usage: number; // bytes
     created_at: Date;
 }
 
 type UserWithoutPassword = Omit<User, "password">;
-type RecievedUser = Omit<User, "user_id" | "created_at" | "role"> & {
+type RecievedUser = Omit<User, "user_id" | "created_at" | "role" | "memory_usage"> & {
     password: string; // plain text password
 };
 

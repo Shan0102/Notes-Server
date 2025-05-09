@@ -5,7 +5,6 @@ import createErrorApp from "../utils/creation/createError";
 function authMiddleware(req: Request, res: Response, next: NextFunction) {
     try {
         const authHeader = req.headers.authorization;
-        console.log(authHeader);
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
             createErrorApp("Unauthorized: No token provided", 401);
         }

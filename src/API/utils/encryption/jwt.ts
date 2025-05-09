@@ -7,7 +7,7 @@ import { JwtPayload } from "../../../types";
 
 const SECRET_KEY = process.env.SECRET_JWT || "your secret key";
 
-function generateToken(payload: object, expiresIn: StringValue | number = "1h"): string {
+function generateToken(payload: object, expiresIn: StringValue | number = "24h"): string {
     const token = jwt.sign(payload, SECRET_KEY, { expiresIn });
     return token;
 }
