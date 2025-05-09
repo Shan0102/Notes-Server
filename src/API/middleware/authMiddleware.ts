@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { verifyToken } from "../utils/jwt";
-import createErrorApp from "../utils/createError";
+import { verifyToken } from "../utils/encryption/jwt";
+import createErrorApp from "../utils/creation/createError";
 
 function authMiddleware(req: Request, res: Response, next: NextFunction) {
     try {
@@ -12,7 +12,7 @@ function authMiddleware(req: Request, res: Response, next: NextFunction) {
 
         const token = authHeader.split(" ")[1];
         const decoded = verifyToken(token);
-        if (!decoded || typeof decoded !== "object" || !decoded.user_id) {
+        if (!decoded || typeof decoded !== "object" || !decoded.user_id || !decoded.role) {
             createErrorApp("Unauthorized: Invalid token", 401);
         }
 

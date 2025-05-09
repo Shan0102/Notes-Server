@@ -4,13 +4,34 @@ interface User {
     username: string; // unique
     email: string;
     password: string; // bcrypt password
-    google_id?: string; // unique
+    google_id: string | null; // unique
+    role: string;
     created_at: Date;
 }
 
-type RecievedUser = Omit<User, "user_id" | "created_at"> & {
+type UserWithoutPassword = Omit<User, "password">;
+type RecievedUser = Omit<User, "user_id" | "created_at" | "role"> & {
     password: string; // plain text password
 };
+
+interface LoginBody {
+    dataType: "email" | "username";
+    data: "string";
+    password: string;
+}
+
+interface Note {
+    note_id: number;
+    user_id: number;
+    title: string;
+    content: string;
+    completed: boolean;
+    updated_at: Date;
+    created_at: Date;
+}
+
+type RecievedNoteFromAPI = Omit<Note, "created_at" | "note_id" | "updated_at">;
+type RecievedNote = Omit<Note, "created_at" | "note_id" | "user_id" | "updated_at">;
 
 interface AppError extends Error {
     status?: number;
@@ -18,7 +39,17 @@ interface AppError extends Error {
 
 interface JwtPayload {
     user_id: number;
-    role?: string;
+    role: string;
 }
 
-export { User, AppError, RecievedUser, JwtPayload };
+export {
+    AppError,
+    JwtPayload,
+    User,
+    UserWithoutPassword,
+    RecievedUser,
+    LoginBody,
+    Note,
+    RecievedNote,
+    RecievedNoteFromAPI,
+};

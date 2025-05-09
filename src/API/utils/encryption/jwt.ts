@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import { StringValue } from "ms";
-import { JwtPayload } from "../../types";
+import { JwtPayload } from "../../../types";
 
 const SECRET_KEY = process.env.SECRET_JWT || "your secret key";
 

@@ -1,25 +1,7 @@
 import mysql from "mysql2";
-import dotenv from "dotenv";
-dotenv.config();
-
+import pool from "./utils/pool.js";
 import { tryCatchWrapper } from "./utils/tryCatch.js";
 import { RecievedUser, User } from "../types/index.js";
-
-const initializePool = () => {
-    return mysql
-        .createPool({
-            host: process.env.DB_HOST,
-            port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 3306,
-            user: process.env.DB_USER,
-            password: process.env.DB_PASSWORD,
-            database: process.env.DB_NAME,
-            connectionLimit: 10,
-            connectTimeout: 60000,
-        })
-        .promise();
-};
-
-const pool = initializePool();
 
 const ensureUsersTableExists = tryCatchWrapper(async () => {
     const createTableQuery = `CREATE TABLE IF NOT EXISTS users (
@@ -29,10 +11,11 @@ const ensureUsersTableExists = tryCatchWrapper(async () => {
             email VARCHAR(255) NOT NULL UNIQUE,
             password VARCHAR(255) NOT NULL,
             google_id VARCHAR(255) UNIQUE,
+            role VARCHAR(10) NOT NULL DEFAULT 'user',
             created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
         );`;
     await pool.query(createTableQuery);
-    console.log(`[${new Date().toLocaleString()}]:Notes table checked/created successfully.`);
+    console.log(`[${new Date().toLocaleString()}]:Users table checked/created successfully.`);
 });
 
 const createUser = tryCatchWrapper(async (user: RecievedUser): Promise<void> => {
@@ -81,18 +64,22 @@ const getUserByUsername = tryCatchWrapper(async (username: string): Promise<User
     return users[0];
 });
 
-const getUserByGoogleId = tryCatchWrapper(async (google_id: string): Promise<User | null> => {
-    const query = `SELECT * FROM users WHERE google_id = ?`;
-    const rows = await pool.query(query, [google_id]);
-    const users = rows[0] as User[];
+const getUserByGoogleId = tryCatchWrapper(
+    async (google_id: string | null): Promise<User | null> => {
+        if (google_id === null) return null;
 
-    if (users.length === 0) {
-        return null;
+        const query = `SELECT * FROM users WHERE google_id = ?`;
+        const rows = await pool.query(query, [google_id]);
+        const users = rows[0] as User[];
+
+        if (users.length === 0) {
+            return null;
+        }
+
+        console.log(`[${new Date().toLocaleString()}]:User retrieved successfully:`, users[0]);
+        return users[0];
     }
-
-    console.log(`[${new Date().toLocaleString()}]:User retrieved successfully:`, users[0]);
-    return users[0];
-});
+);
 
 const updateUser = tryCatchWrapper(async (user_id: number, user: Partial<User>): Promise<void> => {
     const values = [user.name, user.username, user_id];

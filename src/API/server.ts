@@ -1,4 +1,5 @@
-import { ensureUsersTableExists } from "../DB/db";
+import { ensureNotesTableExists } from "../db/notesTable";
+import { ensureUsersTableExists } from "../db/usersTable";
 import app from "./app";
 import dotenv from "dotenv";
 dotenv.config();
@@ -7,7 +8,7 @@ const PORT = process.env.PORT || 3000;
 
 async function startServer() {
     try {
-        console.log(process.env.DB_PASSWORD);
+        await ensureNotesTableExists();
         await ensureUsersTableExists();
         app.listen(PORT, () => {
             console.log(`Server is running on port ${PORT}`);
