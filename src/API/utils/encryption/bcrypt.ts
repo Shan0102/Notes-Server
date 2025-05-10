@@ -24,5 +24,3 @@ async function comparePassword(password: string, hash: string): Promise<boolean>
 }
 
 export { getHash, comparePassword };
-
-// getHash("1234").then((res) => console.log(res));

@@ -6,14 +6,19 @@ import validateNote from "../utils/validation/notesValidation";
 import createdNoteObj from "../utils/creation/createNoteObj";
 import { checkId } from "../utils/validation/usersValidation";
 
+const MAX_MEMORY_USAGE = 1000 * 1000 * 4.5; // bytes // 4.5mbyte
+
 async function createNote(note: unknown, userInfo: JwtPayload | undefined): Promise<Note> {
     validateNote(note);
     const newNote = createdNoteObj(note);
 
     if (!userInfo) createErrorApp("Unauthorized", 401);
-
     const user = await UserDB.getUserById(userInfo.user_id);
+
     if (!user) createErrorApp("User not found", 404);
+    if (user.memory_usage > MAX_MEMORY_USAGE) {
+        createErrorApp("User achieve the max available space for this account", 401);
+    }
 
     const note_id = await NoteDB.createNote({ ...newNote, user_id: userInfo.user_id });
     const createdNote: Note | null = await NoteDB.getNoteById(note_id);
@@ -69,6 +74,12 @@ async function updateNote(
     checkId(id);
 
     if (!userInfo) createErrorApp("Unauthorized", 401);
+    const user = await UserDB.getUserById(userInfo.user_id);
+
+    if (!user) createErrorApp("User not found", 404);
+    if (user.memory_usage > MAX_MEMORY_USAGE) {
+        createErrorApp("User achieve the max available space for this account", 401);
+    }
 
     const noteToUpdate: Note | null = await NoteDB.getNoteById(id);
     if (!noteToUpdate) createErrorApp("Note not found", 404);

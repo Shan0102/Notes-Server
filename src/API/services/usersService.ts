@@ -47,7 +47,10 @@ async function loginUser(
         createErrorApp("Invalid username or password", 401);
     }
 
-    const token = generateToken({ user_id: user.user_id, role: user.role });
+    const token = generateToken({
+        user_id: user.user_id,
+        role: user.role,
+    });
 
     const { password: _, ...userWithoutPassword } = user;
     return { user: userWithoutPassword, token };

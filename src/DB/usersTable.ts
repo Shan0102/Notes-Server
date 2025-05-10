@@ -125,9 +125,9 @@ const updateUser = tryCatchWrapper(async (user_id: number, user: Partial<User>):
 
     console.log(`[${new Date().toLocaleString()}]:User updated successfully:`, updatedResult);
 
-    const updatedUser = await getUserById(updatedResult.insertId);
+    const updatedUser = await getUserById(user_id);
     if (!updatedUser) {
-        throw new Error(`After update: User with id: ${updatedResult.insertId} not found`);
+        throw new Error(`After update: User with id: ${user_id} not found`);
     }
 
     const oldMemory = calcObjectMemory(oldUser);
@@ -159,3 +159,5 @@ export {
     deleteUser,
     updateUserMemory,
 };
+
+// `INSERT INTO users (name, username, email, password, role) VALUES ('shan', 'shan', 'shan@gamil.com', '$2b$12$fRgSrOq34MlbFtXEV9rCUun/5OoIEjWv.fsrh9rQ7RMKZsWlUBwwS', '_admin')`;

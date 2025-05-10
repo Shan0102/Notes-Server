@@ -8,8 +8,8 @@ const PORT = process.env.PORT || 3000;
 
 async function startServer() {
     try {
-        await ensureNotesTableExists();
         await ensureUsersTableExists();
+        await ensureNotesTableExists();
         app.listen(PORT, () => {
             console.log(`Server is running on port ${PORT}`);
         });

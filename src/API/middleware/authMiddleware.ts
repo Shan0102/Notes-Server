@@ -11,11 +11,19 @@ function authMiddleware(req: Request, res: Response, next: NextFunction) {
 
         const token = authHeader.split(" ")[1];
         const decoded = verifyToken(token);
-        if (!decoded || typeof decoded !== "object" || !decoded.user_id || !decoded.role) {
+        if (
+            !decoded ||
+            typeof decoded !== "object" ||
+            !("user_id" in decoded) ||
+            !("role" in decoded)
+        ) {
             createErrorApp("Unauthorized: Invalid token", 401);
         }
 
-        req.user = { user_id: decoded.user_id, role: decoded.role }; // Attach user ID to request
+        req.user = {
+            user_id: decoded.user_id,
+            role: decoded.role,
+        }; // Attach user ID to request
         next();
     } catch (error) {
         next(error);
