@@ -3,7 +3,7 @@ import { JwtPayload, User, UserWithoutPassword } from "../../types/index";
 import validateUser, { checkId } from "../utils/validation/usersValidation";
 import createErrorApp from "../utils/creation/createError";
 
-import { comparePassword } from "../utils/encryption/bcrypt";
+import { comparePassword, getHash } from "../utils/encryption/bcrypt";
 import { generateToken } from "../utils/encryption/jwt";
 import createUserObj from "../utils/creation/createUserObj";
 import validateLoginBody from "../utils/validation/loginBodyValidation";
@@ -96,6 +96,9 @@ async function updateUserInfo(
         createErrorApp("Forbidden", 403);
     }
 
+    const userWithThisUsername = await UserDB.getUserByUsername(username);
+    if (userWithThisUsername) createErrorApp("Username is already in use", 409);
+
     await UserDB.updateUserInfo(id, { name, username });
     const updatedUser = await UserDB.getUserById(id);
     if (!updatedUser) createErrorApp("User update failed", 500);
@@ -129,8 +132,8 @@ async function updateUserPassword(
     if (!isPasswordValid) {
         createErrorApp("Incorrect password", 401);
     }
-
-    await UserDB.updateUserPassword(id, newPassword);
+    const hashedPassword = await getHash(newPassword);
+    await UserDB.updateUserPassword(id, hashedPassword);
 
     const updatedUser = await UserDB.getUserById(id);
     if (!updatedUser) createErrorApp("Password update failed", 500);
