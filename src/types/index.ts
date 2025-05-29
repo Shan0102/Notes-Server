@@ -21,6 +21,16 @@ interface LoginBody {
     password: string;
 }
 
+interface UserInfoBody {
+    name: string;
+    username: string;
+}
+
+interface PasswordsBody {
+    prevPassword: string;
+    newPassword: string;
+}
+
 interface Note {
     note_id: number;
     user_id: number;
@@ -50,6 +60,8 @@ export {
     UserWithoutPassword,
     RecievedUser,
     LoginBody,
+    UserInfoBody,
+    PasswordsBody,
     Note,
     RecievedNote,
     RecievedNoteFromAPI,

@@ -7,6 +7,8 @@ import { comparePassword } from "../utils/encryption/bcrypt";
 import { generateToken } from "../utils/encryption/jwt";
 import createUserObj from "../utils/creation/createUserObj";
 import validateLoginBody from "../utils/validation/loginBodyValidation";
+import { validateUserInfoBody } from "../utils/validation/userInfoBodyValidation";
+import { validatePasswordsBody } from "../utils/validation/passwordsBodyValidation";
 
 async function createUser(user: unknown): Promise<UserWithoutPassword> {
     validateUser(user);
@@ -73,4 +75,65 @@ async function deleteUser(user_id: string, userInfo: JwtPayload | undefined): Pr
     await UserDB.deleteUser(id);
 }
 
-export { createUser, loginUser, deleteUser };
+async function updateUserInfo(
+    userInfoBody: unknown,
+    user_id: string,
+    userInfo: JwtPayload | undefined
+): Promise<UserWithoutPassword> {
+    validateUserInfoBody(userInfoBody);
+    const { name, username } = userInfoBody;
+
+    const id = parseInt(user_id, 10);
+    checkId(id);
+
+    const user: User | null = await UserDB.getUserById(id);
+    if (!user) {
+        createErrorApp("User not found", 404);
+    }
+
+    if (!userInfo) createErrorApp("Unauthorized", 401);
+    if (userInfo.role !== "_admin" && userInfo.user_id !== id) {
+        createErrorApp("Forbidden", 403);
+    }
+
+    await UserDB.updateUserInfo(id, { name, username });
+    const updatedUser = await UserDB.getUserById(id);
+    if (!updatedUser) createErrorApp("User update failed", 500);
+
+    const { password, ...userWithoutPassword } = updatedUser;
+    return userWithoutPassword;
+}
+
+async function updateUserPassword(
+    passwordsBody: unknown,
+    user_id: string,
+    userInfo: JwtPayload | undefined
+): Promise<void> {
+    validatePasswordsBody(passwordsBody);
+    const { prevPassword, newPassword } = passwordsBody;
+
+    const id = parseInt(user_id, 10);
+    checkId(id);
+
+    const user: User | null = await UserDB.getUserById(id);
+    if (!user) {
+        createErrorApp("User not found", 404);
+    }
+
+    if (!userInfo) createErrorApp("Unauthorized", 401);
+    if (userInfo.role !== "_admin" && userInfo.user_id !== id) {
+        createErrorApp("Forbidden", 403);
+    }
+
+    const isPasswordValid = await comparePassword(prevPassword, user.password);
+    if (!isPasswordValid) {
+        createErrorApp("Incorrect password", 401);
+    }
+
+    await UserDB.updateUserPassword(id, newPassword);
+
+    const updatedUser = await UserDB.getUserById(id);
+    if (!updatedUser) createErrorApp("Password update failed", 500);
+}
+
+export { createUser, loginUser, deleteUser, updateUserInfo, updateUserPassword };

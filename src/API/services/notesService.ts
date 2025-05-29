@@ -9,6 +9,7 @@ import { checkId } from "../utils/validation/usersValidation";
 const MAX_MEMORY_USAGE = 1000 * 1000 * 4.5; // bytes // 4.5mbyte
 
 async function createNote(note: unknown, userInfo: JwtPayload | undefined): Promise<Note> {
+    console.log(note);
     validateNote(note);
     const newNote = createdNoteObj(note);
 

@@ -35,7 +35,7 @@ function validateUsername(username: unknown): void {
     }
 }
 
-function validatePassword(password: unknown): void {
+function validatePassword(password: unknown): asserts password is string {
     if (!password || typeof password !== "string") {
         createErrorApp("Invalid password: Password is required and must be a string.", 400);
     }
@@ -55,7 +55,7 @@ function validatePassword(password: unknown): void {
     }
 }
 
-function validateEmail(email: unknown): void {
+function validateEmail(email: unknown): asserts email is string {
     if (!email || typeof email !== "string") {
         createErrorApp("Invalid email: Email is required and must be a string.", 400);
     }
@@ -83,5 +83,5 @@ function checkId(id: number | typeof NaN): asserts id is number {
     }
 }
 
-export { isEmail, checkId };
+export { isEmail, checkId, validateName, validatePassword };
 export default validateUser;

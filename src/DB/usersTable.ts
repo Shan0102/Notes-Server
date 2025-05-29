@@ -108,33 +108,71 @@ const getUserByGoogleId = tryCatchWrapper(
     }
 );
 
-const updateUser = tryCatchWrapper(async (user_id: number, user: Partial<User>): Promise<void> => {
-    const oldUser = await getUserById(user_id);
-    if (!oldUser) {
-        throw new Error(`Before update: User with id: ${user_id} not found`);
+const updateUserInfo = tryCatchWrapper(
+    async (user_id: number, user: Pick<User, "name" | "username">): Promise<void> => {
+        const oldUser = await getUserById(user_id);
+        if (!oldUser) {
+            throw new Error(`Before update: User with id: ${user_id} not found`);
+        }
+
+        const values = [user.name, user.username, user_id];
+        const query = `UPDATE users SET name = ?, username = ? WHERE user_id = ?`;
+        const [result] = await pool.query(query, values);
+
+        const updatedResult = result as mysql.ResultSetHeader;
+        if (updatedResult.affectedRows === 0) {
+            throw new Error(`User with ID ${user_id} not found`);
+        }
+
+        console.log(
+            `[${new Date().toLocaleString()}]:User info updated successfully:`,
+            updatedResult
+        );
+
+        const updatedUser = await getUserById(user_id);
+        if (!updatedUser) {
+            throw new Error(`After update: User with id: ${user_id} not found`);
+        }
+
+        const oldMemory = calcObjectMemory(oldUser);
+        const newMemory = calcObjectMemory(updatedUser);
+
+        await updateUserMemory(user_id, newMemory - oldMemory);
     }
+);
 
-    const values = [user.name, user.username, user_id];
-    const query = `UPDATE users SET name = ?, username = ? WHERE user_id = ?`;
-    const [result] = await pool.query(query, values);
+const updateUserPassword = tryCatchWrapper(
+    async (user_id: number, password: string): Promise<void> => {
+        const oldUser = await getUserById(user_id);
+        if (!oldUser) {
+            throw new Error(`Before update: User with id: ${user_id} not found`);
+        }
 
-    const updatedResult = result as mysql.ResultSetHeader;
-    if (updatedResult.affectedRows === 0) {
-        throw new Error(`User with ID ${user_id} not found`);
+        const values = [password, user_id];
+        const query = `UPDATE users SET password = ? WHERE user_id = ?`;
+        const [result] = await pool.query(query, values);
+
+        const updatedResult = result as mysql.ResultSetHeader;
+        if (updatedResult.affectedRows === 0) {
+            throw new Error(`User with ID ${user_id} not found`);
+        }
+
+        console.log(
+            `[${new Date().toLocaleString()}]:User password updated successfully:`,
+            updatedResult
+        );
+
+        const updatedUser = await getUserById(user_id);
+        if (!updatedUser) {
+            throw new Error(`After update: User with id: ${user_id} not found`);
+        }
+
+        const oldMemory = calcObjectMemory(oldUser);
+        const newMemory = calcObjectMemory(updatedUser);
+
+        await updateUserMemory(user_id, newMemory - oldMemory);
     }
-
-    console.log(`[${new Date().toLocaleString()}]:User updated successfully:`, updatedResult);
-
-    const updatedUser = await getUserById(user_id);
-    if (!updatedUser) {
-        throw new Error(`After update: User with id: ${user_id} not found`);
-    }
-
-    const oldMemory = calcObjectMemory(oldUser);
-    const newMemory = calcObjectMemory(updatedUser);
-
-    await updateUserMemory(user_id, newMemory - oldMemory);
-});
+);
 
 const deleteUser = tryCatchWrapper(async (user_id: number): Promise<void> => {
     const query = `DELETE FROM users WHERE user_id = ?`;
@@ -151,11 +189,12 @@ const deleteUser = tryCatchWrapper(async (user_id: number): Promise<void> => {
 export {
     ensureUsersTableExists,
     createUser,
+    updateUserInfo,
+    updateUserPassword,
     getUserById,
-    getUserByEmail,
     getUserByUsername,
+    getUserByEmail,
     getUserByGoogleId,
-    updateUser,
     deleteUser,
     updateUserMemory,
 };
