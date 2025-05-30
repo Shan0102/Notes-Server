@@ -34,6 +34,9 @@ function validatePassword(password: unknown): void {
     if (!password || typeof password !== "string") {
         createErrorApp("Invalid password: Password is required and must be a string.", 400);
     }
+    if (password.length < 1) {
+        createErrorApp("Invalid password: Password is required.", 400);
+    }
 }
 
 export default validateLoginBody;

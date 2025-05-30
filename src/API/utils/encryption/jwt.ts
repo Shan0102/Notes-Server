@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload as Payload } from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -22,4 +22,14 @@ function verifyToken(token: string): JwtPayload | null {
     }
 }
 
-export { generateToken, verifyToken };
+function decodeToken(token: string): Payload | null {
+    try {
+        const data = jwt.decode(token);
+        if (typeof data === "string") return null;
+        return data;
+    } catch (error) {
+        return null;
+    }
+}
+
+export { generateToken, verifyToken, decodeToken };

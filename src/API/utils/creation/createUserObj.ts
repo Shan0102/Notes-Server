@@ -1,4 +1,4 @@
-import { RecievedUser } from "../../../types";
+import { GoogleUserInfo, RecievedUser } from "../../../types";
 import { getHash } from "../encryption/bcrypt";
 
 async function createUserObj(user: RecievedUser): Promise<RecievedUser> {
@@ -15,4 +15,17 @@ async function createUserObj(user: RecievedUser): Promise<RecievedUser> {
     return newUser;
 }
 
+function createUserObjWithGoogleOauth(googleUser: GoogleUserInfo): RecievedUser {
+    const newUser: RecievedUser = {
+        name: googleUser.name.trim(),
+        username: googleUser.name.trim(),
+        email: googleUser.email,
+        google_id: googleUser.id,
+        password: "",
+    };
+
+    return newUser;
+}
+
 export default createUserObj;
+export { createUserObjWithGoogleOauth };

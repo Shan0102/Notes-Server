@@ -53,6 +53,30 @@ interface JwtPayload {
     role: string;
 }
 
+interface GoogleDataDecoded {
+    iss: string;
+    azp: string;
+    aud: string;
+    sub: string;
+    email: string;
+    email_verified: boolean;
+    at_hash: string;
+    name: string;
+    picture: string;
+    given_name: string;
+    iat: number;
+    exp: number;
+}
+
+interface GoogleUserInfo {
+    id: string;
+    email: string;
+    verified_email: boolean;
+    name: string;
+    given_name: string;
+    picture: string;
+}
+
 export {
     AppError,
     JwtPayload,
@@ -65,4 +89,6 @@ export {
     Note,
     RecievedNote,
     RecievedNoteFromAPI,
+    GoogleDataDecoded,
+    GoogleUserInfo,
 };
