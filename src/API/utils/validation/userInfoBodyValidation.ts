@@ -7,11 +7,11 @@ function validateUserInfoBody(userInfoBody: unknown): asserts userInfoBody is Us
         createErrorApp("Invalid Data: Data must be an object.", 400);
     }
 
-    if (!("user" in userInfoBody)) createErrorApp("Invalid user: User is required.", 400);
+    if (!("name" in userInfoBody)) createErrorApp("Invalid user: Name is required.", 400);
     if (!("username" in userInfoBody))
         createErrorApp("Invalid username: Username is required.", 400);
 
-    validateName(userInfoBody.user);
+    validateName(userInfoBody.name);
     validateName(userInfoBody.username);
 }
 

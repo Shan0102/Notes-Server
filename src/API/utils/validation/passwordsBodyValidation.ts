@@ -7,16 +7,16 @@ function validatePasswordsBody(passwordsBody: unknown): asserts passwordsBody is
         createErrorApp("Invalid passwordsBody: PasswordsBody must be an object.", 400);
     }
 
-    if (!("prevPassword" in passwordsBody))
-        createErrorApp("Invalid prevPassword: PrevPassword is required.", 400);
-    if (!("newPassword" in passwordsBody))
-        createErrorApp("Invalid newPassword: NewPassword is required.", 400);
+    if (!("prev_password" in passwordsBody))
+        createErrorApp("Invalid prevPassword: Prev_password is required.", 400);
+    if (!("new_password" in passwordsBody))
+        createErrorApp("Invalid newPassword: New_password is required.", 400);
 
-    if (typeof passwordsBody.prevPassword !== "string") {
-        createErrorApp("Invalid prevPassword: PrevPassword must be a string.", 400);
+    if (typeof passwordsBody.prev_password !== "string") {
+        createErrorApp("Invalid prevPassword: Prev_password must be a string.", 400);
     }
 
-    validatePassword(passwordsBody.newPassword);
+    validatePassword(passwordsBody.new_password);
 }
 
 export { validatePasswordsBody };

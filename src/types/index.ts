@@ -27,8 +27,8 @@ interface UserInfoBody {
 }
 
 interface PasswordsBody {
-    prevPassword: string;
-    newPassword: string;
+    prev_password: string;
+    new_password: string;
 }
 
 interface Note {

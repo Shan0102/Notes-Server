@@ -12,6 +12,7 @@ function errorHandler(error: AppError, req: Request, res: Response, next: NextFu
 
 function notFoundHandler(req: Request, res: Response) {
     res.status(404).json({ Error: "Not Found" });
+    console.error(`[${new Date().toISOString()}] Error: ${"Not Found"}`);
 }
 
 export { errorHandler, notFoundHandler };

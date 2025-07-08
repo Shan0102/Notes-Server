@@ -113,7 +113,7 @@ async function updateUserPassword(
     userInfo: JwtPayload | undefined
 ): Promise<void> {
     validatePasswordsBody(passwordsBody);
-    const { prevPassword, newPassword } = passwordsBody;
+    const { prev_password, new_password } = passwordsBody;
 
     const id = parseInt(user_id, 10);
     checkId(id);
@@ -128,11 +128,11 @@ async function updateUserPassword(
         createErrorApp("Forbidden", 403);
     }
 
-    const isPasswordValid = await comparePassword(prevPassword, user.password);
+    const isPasswordValid = await comparePassword(prev_password, user.password);
     if (!isPasswordValid) {
         createErrorApp("Incorrect password", 401);
     }
-    const hashedPassword = await getHash(newPassword);
+    const hashedPassword = await getHash(new_password);
     await UserDB.updateUserPassword(id, hashedPassword);
 
     const updatedUser = await UserDB.getUserById(id);
