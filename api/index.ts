@@ -1,5 +1,5 @@
-import { ensureNotesTableExists } from "../db/notesTable";
-import { ensureUsersTableExists } from "../db/usersTable";
+import { ensureNotesTableExists } from "./db/notesTable";
+import { ensureUsersTableExists } from "./db/usersTable";
 import app from "./app";
 import dotenv from "dotenv";
 dotenv.config();

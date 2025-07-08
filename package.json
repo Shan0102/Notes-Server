@@ -4,7 +4,7 @@
     "main": "index.js",
     "type": "commonjs",
     "scripts": {
-        "start": "node dist/api/index",
+        "start": "node dist/index",
         "build": "tsc"
     },
     "keywords": [],

@@ -1,10 +1,10 @@
 import express from "express";
 import cors from "cors";
 
-import usersRouter from "./routers/usersRouter";
-import notesRouter from "./routers/notesRouter";
-import { notFoundHandler, errorHandler } from "./utils/errorHandlers";
-import googleOauthHandler from "./controllers/sessionsController";
+import usersRouter from "./server/routers/usersRouter";
+import notesRouter from "./server/routers/notesRouter";
+import { notFoundHandler, errorHandler } from "./server/utils/errorHandlers";
+import googleOauthHandler from "./server/controllers/sessionsController";
 
 const app = express();
 
