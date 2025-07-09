@@ -4,7 +4,6 @@ import { generateToken } from "../utils/encryption/jwt";
 import * as UserDB from "../../db/usersTable";
 import createErrorApp from "../utils/creation/createError";
 import { createUserObjWithGoogleOauth } from "../utils/creation/createUserObj";
-import { env } from "process";
 
 async function googleOauthHandler(req: Request, res: Response, next: NextFunction) {
     try {
@@ -14,6 +13,7 @@ async function googleOauthHandler(req: Request, res: Response, next: NextFunctio
 
         // get user with tokens
         const googleUser = await sessionsService.getGoogleUser(id_token, access_token);
+        console.log("Google User:", googleUser);
 
         // upsert the user
         let user = await UserDB.getUserByGoogleId(googleUser.id);
